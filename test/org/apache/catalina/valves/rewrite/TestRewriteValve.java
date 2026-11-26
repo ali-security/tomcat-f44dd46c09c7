@@ -20,7 +20,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
-import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -45,6 +44,7 @@ import org.apache.catalina.startup.Tomcat;
 import org.apache.catalina.startup.TomcatBaseTest;
 import org.apache.catalina.valves.ValveBase;
 import org.apache.tomcat.util.buf.ByteChunk;
+import org.apache.tomcat.util.buf.UDecoder;
 import org.apache.tomcat.util.http.Method;
 
 /*
@@ -1162,6 +1162,12 @@ public class TestRewriteValve extends TomcatBaseTest {
     }
 
 
+    @Test
+    public void testEncodedUriPlus() throws Exception {
+        doTestRewriteWithEncoding("a+b");
+    }
+
+
     private void doTestRewriteWithEncoding(String segment) throws Exception {
         doTestRewriteWithEncoding(segment, segment, null);
     }
@@ -1192,7 +1198,7 @@ public class TestRewriteValve extends TomcatBaseTest {
         String body = res.toString();
         Assert.assertTrue(body, body.contains("REQUEST-URI: /target/" + expectedSegment));
         Assert.assertTrue(body, body.contains("PATH-INFO: /" +
-                URLDecoder.decode(expectedSegment, "UTF-8")));
+                UDecoder.URLDecode(expectedSegment, StandardCharsets.UTF_8)));
         Assert.assertTrue(body, body.contains("REQUEST-QUERY-STRING: " + expectedQueryString));
     }
 
